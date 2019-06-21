@@ -11,7 +11,7 @@ download/clone project then open the file [index.html](index.html) in your brows
 
 
 ## Play
-open site [Classic Arcade Game](www.https://donatluffy.github.io/ClassicArcadeGame/) and have fun !
+open site [Classic Arcade Game](https://donatluffy.github.io/ClassicArcadeGame/) and have fun !
 
 👤 **Mesh3ludacity**
 
