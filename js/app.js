@@ -37,9 +37,7 @@ class Enemy {
 
     collision() {
         counter.textContent = '0';
-        if(Number(counter.textContent) > topScore){
-            topScore = Number(counter.textContent);
-        }
+        flag = true;
         player.reset();
     }
 
@@ -71,47 +69,42 @@ class Player {
         ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
     }
 
-    //const Posistions = [0,100,200,300,400];
-    //const Posistions = [0,-100,-200,-300,-400,-500];
     handleInput(direction) {
         switch (direction) {
           case 'left':
-            if(this.x != 0){
-                if(!this.isColloision(Posistions[Posistions.indexOf(this.x)-1], this.y))
-                    this.x = Posistions[Posistions.indexOf(this.x)-1];
+            if(this.x > 0){
+              if(!this.isColloision(PosistionsX[PosistionsX.indexOf(this.x)-1], this.y))
+                this.x -= 100;
             }
             break;
           case 'right':
-            if(this.x != 400){
-                if(!this.isColloision(Posistions[Posistions.indexOf(this.x)+1], this.y))
-                    this.x = Posistions[Posistions.indexOf(this.x)+1];
+            if(this.x + 100 < 500){
+              if(!this.isColloision(PosistionsX[PosistionsX.indexOf(this.x)+1], this.y))
+                this.x += 100;
             }
             break;
           case 'up':
-            if(this.y >= 0){
-                if(!this.isColloision(this.x, Posistions[Posistions.indexOf(this.y)-1])){
-                    if(this.y === 0){
-                        inceramentScore();
-                        this.reset();
-                        if(Number(counter.textContent) === topScore){ // congrats after 10 times
-                            win();
-                        }
-                    }else{
-                        this.y = Posistions[Posistions.indexOf(this.y)-1] 
-                    }
+            if(this.y > 0){
+              if(!this.isColloision(this.x, PosistionsY[PosistionsY.indexOf(this.y)-1])){
+                if(this.y === 60){
+                  inceramentScore();
+                  this.reset();
+                }else{
+                    this.y -= 85; 
                 }
+              }
             }
             break;
           case 'down':
-            if(this.y != 400)
-                if(!this.isColloision(this.x, Posistions[Posistions.indexOf(this.y)+1]))
-                    this.y = Posistions[Posistions.indexOf(this.y)+1] 
+            if(this.y + 85 < 465)
+              if(!this.isColloision(this.x, PosistionsY[PosistionsY.indexOf(this.y)+1]))
+                this.y  += 85; 
             break;
         }
     }
     
     isColloision(x, y) {
-        return Math.sqrt(Math.pow(x - rock.x,2) + Math.pow(y - rock.y,2)) < 100;
+        return Math.sqrt(Math.pow(x - rock.x,2) + Math.pow(y - rock.y,2)) < 50;
     }
 
     // reset inital player's posistion
@@ -125,18 +118,23 @@ class Player {
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 
-const allEnemies = [];
-const x_axis = [-100,-200,-300,-400,-500];
-const y_axis = [60,140,220];
-const speedEnemy = [200,300,400,500,600];
-const createEnemies = (function() {
+let allEnemies = [];
+let x_axis = [-100,-200,-300,-400,-500];
+let y_axis = [60,140,220];
+let speedEnemy = [200,300,400,500,600];
+let createEnemies = (function() {
+    let randomX = Math.floor(Math.random() * x_axis.length);
+    let randomY = Math.floor(Math.random() * y_axis.length);
+    let randomSpeed = Math.floor(Math.random() * speedEnemy.length);
+
     for (let i = 0; i < 5; i++) {
-        allEnemies[i] = new Enemy(x_axis[Math.floor(Math.random()*x_axis.length)], y_axis[Math.floor(Math.random()*y_axis.length)], speedEnemy[Math.floor(Math.random()*speedEnemy.length)]);
+        allEnemies[i] = new Enemy(x_axis[randomX], y_axis[randomY], speedEnemy[randomSpeed]);
     }
 })();
 
-const Posistions = [0,100,200,300,400];
-const player = new Player();
+let PosistionsX = [0,100,200,300,400];
+let PosistionsY = [60,145,230,315,400];
+let player = new Player();
 
 let topScore = 1;
 // add score to the DOM
@@ -152,12 +150,17 @@ let topScore = 1;
   })();
   //set as global to prevent iterate code
   let counter = document.querySelector('.counter');
-  
+  let flag = false;
   //increment Score on the DOM
   function inceramentScore() {
     counter.textContent = Number(counter.textContent) + 1;
-    if(Number(counter.textContent) > topScore)
-        topScore= Number(counter.textContent);
+    if(Number(counter.textContent) > topScore){
+        topScore = Number(counter.textContent);
+        if(flag){
+            flag = false;
+            win();
+        }
+    }
   }
 
 // This listens for key presses and sends the keys to your
@@ -203,11 +206,9 @@ class Resource {
     }
 }
 // create resources
-// let gem = new Resource('images/Gem Blue.png', Posistions[Math.floor(Math.random()*Posistions.length)], Posistions[Math.floor(Math.random()*Posistions.length)]);
-const rock = new Resource('images/Rock.png', Posistions[Math.floor(Math.random()*Posistions.length)], Posistions[Math.floor(Math.random()*Posistions.length)]);
+let rock = new Resource('images/Rock.png', PosistionsX[Math.floor(Math.random()* PosistionsX.length)], PosistionsY[Math.floor(Math.random()*PosistionsY.length)]);
 
 function win() {
-    console.log("yee");
     ctx.drawImage(Resources.get('images/Selector.png'), player.x, player.y);
     setTimeout(function(){
 
@@ -232,7 +233,7 @@ document.addEventListener('keypress', function(e) {
 //add popup when player is win
 function win() {
     swal({
-            title: "Congratulations! You Won!",
+            title: "You Are The Top 🌟",
             text: "With: " + topScore +" score",
             icon: "success",
       });
